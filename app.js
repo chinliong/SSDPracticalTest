@@ -51,15 +51,19 @@ function validateSearchTerm(input) {
 
   // XSS Detection - OWASP Control C5: Validate All Inputs
   const xssPatterns = [
-    /<script\b[^>]*>[\s\S]*?<\/script>/gi,
+    // Simple string-based checks to avoid ReDoS
+    /<script/gi,
+    /<\/script>/gi,
     /javascript:/gi,
-    /on\w+\s*=/gi,
-    /<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi,
-    /<object\b[^>]*>[\s\S]*?<\/object>/gi,
-    /<embed\b[^>]*>/gi,
+    /\bon\w+\s*=/gi,
+    /<iframe/gi,
+    /<\/iframe>/gi,
+    /<object/gi,
+    /<\/object>/gi,
+    /<embed/gi,
     /expression\s*\(/gi,
     /vbscript:/gi,
-    /<img\b[^>]*src\s*=\s*[^>]*javascript:/gi,
+    /<img[^>]*javascript:/gi,
   ];
 
   for (const pattern of xssPatterns) {
