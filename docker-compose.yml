@@ -4,7 +4,7 @@ services:
     ports:
       - "80:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV}
     networks:
       - app-network
     healthcheck:
@@ -19,6 +19,10 @@ services:
       - "9000:9000"
     environment:
       - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+      - SONAR_SECURITY_REALM=sonar
+      - SONAR_JDBC_USERNAME=${SONAR_JDBC_USERNAME}
+      - SONAR_JDBC_PASSWORD=${SONAR_JDBC_PASSWORD}
+      - SONARQUBE_ADMIN_PASSWORD=${SONARQUBE_ADMIN_PASSWORD}
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_logs:/opt/sonarqube/logs
