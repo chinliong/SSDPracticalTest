@@ -55,15 +55,18 @@ function validateSearchTerm(input) {
     /<script/gi,
     /<\/script>/gi,
     /javascript:/gi,
-    /\bon\w+=|onclick=|onload=|onerror=/gi,
+    /onclick=/gi,
+    /onload=/gi,
+    /onerror=/gi,
+    /onmouseover=/gi,
     /<iframe/gi,
     /<\/iframe>/gi,
     /<object/gi,
     /<\/object>/gi,
     /<embed/gi,
-    /expression\s*\(/gi,
+    /<img/gi,
+    /expression\(/gi,
     /vbscript:/gi,
-    /<img.*javascript:/gi,
   ];
 
   for (const pattern of xssPatterns) {
@@ -74,12 +77,26 @@ function validateSearchTerm(input) {
 
   // SQL Injection Detection
   const sqlPatterns = [
-    /\b(select|insert|update|delete|drop|create|alter|exec|execute|union|or|and)\b/gi,
-    /['"];|--|\/\*|\*\//g,
-    /\s+(or|and)\s+\d+=\d+/gi,
-    /\bunion\s+select/gi,
-    /\bunion\s+all\s+select/gi,
-    /\b(exec|execute)\(/gi,
+    // Use simple string checks instead of complex regex to avoid ReDoS
+    /\bselect\b/gi,
+    /\binsert\b/gi,
+    /\bupdate\b/gi,
+    /\bdelete\b/gi,
+    /\bdrop\b/gi,
+    /\bcreate\b/gi,
+    /\balter\b/gi,
+    /\bexec\b/gi,
+    /\bexecute\b/gi,
+    /\bunion\b/gi,
+    /\bor\b/gi,
+    /\band\b/gi,
+    /['"];/g,
+    /--/g,
+    /\/\*/g,
+    /\*\//g,
+    // Split the union select check into simpler parts
+    /union\s+select/gi,
+    /union\s+all\s+select/gi,
   ];
 
   for (const pattern of sqlPatterns) {
