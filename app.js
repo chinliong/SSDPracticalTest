@@ -55,7 +55,7 @@ function validateSearchTerm(input) {
     /<script/gi,
     /<\/script>/gi,
     /javascript:/gi,
-    /\bon\w+\s*=/gi,
+    /\bon\w+=|onclick=|onload=|onerror=/gi,
     /<iframe/gi,
     /<\/iframe>/gi,
     /<object/gi,
@@ -63,7 +63,7 @@ function validateSearchTerm(input) {
     /<embed/gi,
     /expression\s*\(/gi,
     /vbscript:/gi,
-    /<img[^>]*javascript:/gi,
+    /<img.*javascript:/gi,
   ];
 
   for (const pattern of xssPatterns) {
@@ -76,10 +76,10 @@ function validateSearchTerm(input) {
   const sqlPatterns = [
     /\b(select|insert|update|delete|drop|create|alter|exec|execute|union|or|and)\b/gi,
     /['"];|--|\/\*|\*\//g,
-    /\s+(or|and)\s+\d+\s*=\s*\d+/gi,
-    // eslint-disable-next-line security/detect-unsafe-regex
-    /\bunion\s+(?:all\s+)?select/gi,
-    /\b(exec|execute)\s*\(/gi,
+    /\s+(or|and)\s+\d+=\d+/gi,
+    /\bunion\s+select/gi,
+    /\bunion\s+all\s+select/gi,
+    /\b(exec|execute)\(/gi,
   ];
 
   for (const pattern of sqlPatterns) {
