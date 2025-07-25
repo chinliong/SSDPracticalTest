@@ -5,6 +5,8 @@ services:
       - "80:3000"
     environment:
       - NODE_ENV=${NODE_ENV}
+      - ADMIN_USERNAME=${SONARQUBE_ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${SONARQUBE_ADMIN_PASSWORD}
     networks:
       - app-network
     healthcheck:
@@ -21,6 +23,7 @@ services:
       - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
       - SONAR_WEB_JAVAADDITIONALOPTS=-Dsonar.security.realm=sonar -Dsonar.forceAuthentication=false
       - SONARQUBE_ADMIN_PASSWORD=${SONARQUBE_ADMIN_PASSWORD}
+      - SONAR_SECURITY_ADMINPASSWORD=${SONARQUBE_ADMIN_PASSWORD}
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_logs:/opt/sonarqube/logs
