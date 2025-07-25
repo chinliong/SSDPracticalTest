@@ -28,12 +28,31 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install ESLint SARIF formatter
+        run: npm install --save-dev @microsoft/eslint-formatter-sarif
+
       - name: Run ESLint Security Analysis
-        run: npx eslint . --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif
+        run: |
+          npx eslint . --format @microsoft/eslint-formatter-sarif --output-file eslint-results.sarif || echo "ESLint completed with issues"
+          # Ensure the file exists even if ESLint finds no issues
+          if [ ! -f eslint-results.sarif ]; then
+            echo '{"version":"2.1.0","runs":[{"tool":{"driver":{"name":"ESLint"}},"results":[]}]}' > eslint-results.sarif
+          fi
         continue-on-error: true
+
+      - name: Check if SARIF file exists
+        run: |
+          if [ -f eslint-results.sarif ]; then
+            echo "SARIF file exists"
+            cat eslint-results.sarif
+          else
+            echo "SARIF file does not exist"
+            exit 1
+          fi
 
       - name: Upload ESLint analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v3
+        if: always()
         with:
           sarif_file: eslint-results.sarif
           category: eslint

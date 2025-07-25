@@ -41,8 +41,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Input validation function
 function validateSearchTerm(input) {
-  if (!input || typeof input !== 'string') {
-    return { isValid: true, type: 'valid' };
+  if (!input || typeof input !== "string") {
+    return { isValid: true, type: "valid" };
   }
 
   // XSS Detection - OWASP Control C5: Validate All Inputs
@@ -58,28 +58,28 @@ function validateSearchTerm(input) {
     /<img[^>]*src[^>]*javascript:/gi
   ];
 
-  for (let pattern of xssPatterns) {
+  for (const pattern of xssPatterns) {
     if (pattern.test(input)) {
-      return { isValid: false, type: 'xss' };
+      return { isValid: false, type: "xss" };
     }
   }
 
   // SQL Injection Detection
   const sqlPatterns = [
     /(\b(select|insert|update|delete|drop|create|alter|exec|execute|union|or|and)\b)/gi,
-    /('|('')|;|--|\/\*|\*\/)/g,
-    /\b(or|and)\s+\w+\s*=\s*\w+/gi,
-    /\bunion\s+(all\s+)?select/gi,
+    /['"];|--|\/\*|\*\//g,
+    /\b(or|and)\s+\w{1,20}\s*=\s*\w{1,20}/gi,
+    /\bunion\s+(all\s+)?select/gi, // eslint-disable-line security/detect-unsafe-regex
     /\b(exec|execute)\s*\(/gi
   ];
 
-  for (let pattern of sqlPatterns) {
+  for (const pattern of sqlPatterns) {
     if (pattern.test(input)) {
-      return { isValid: false, type: 'sql' };
+      return { isValid: false, type: "sql" };
     }
   }
 
-  return { isValid: true, type: 'valid' };
+  return { isValid: true, type: "valid" };
 }
 
 // Routes

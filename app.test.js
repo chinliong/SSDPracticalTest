@@ -13,31 +13,31 @@ describe("Search Term Validation", () => {
   test("should detect XSS attack", () => {
     const result = validateSearchTerm("<script>alert('xss')</script>");
     expect(result.isValid).toBe(false);
-    expect(result.type).toBe('xss');
+    expect(result.type).toBe("xss");
   });
 
   test("should detect SQL injection", () => {
     const result = validateSearchTerm("'; DROP TABLE users; --");
     expect(result.isValid).toBe(false);
-    expect(result.type).toBe('sql');
+    expect(result.type).toBe("sql");
   });
 
   test("should accept valid search term", () => {
     const result = validateSearchTerm("hello world");
     expect(result.isValid).toBe(true);
-    expect(result.type).toBe('valid');
+    expect(result.type).toBe("valid");
   });
 
   test("should detect javascript in input", () => {
     const result = validateSearchTerm("javascript:alert(1)");
     expect(result.isValid).toBe(false);
-    expect(result.type).toBe('xss');
+    expect(result.type).toBe("xss");
   });
 
   test("should detect union select attack", () => {
     const result = validateSearchTerm("1 UNION SELECT * FROM users");
     expect(result.isValid).toBe(false);
-    expect(result.type).toBe('sql');
+    expect(result.type).toBe("sql");
   });
 });
 
