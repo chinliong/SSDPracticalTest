@@ -11,7 +11,7 @@ function escapeHtml(text) {
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
-    '"': "&quot;",
+    "\"": "&quot;",
     "'": "&#039;",
   };
   return text.replace(/[&<>"']/g, function (m) {
@@ -51,15 +51,15 @@ function validateSearchTerm(input) {
 
   // XSS Detection - OWASP Control C5: Validate All Inputs
   const xssPatterns = [
-    /<script[^>]*>.*?<\/script>/gi,
+    /<script\b[^>]*>[\s\S]*?<\/script>/gi,
     /javascript:/gi,
     /on\w+\s*=/gi,
-    /<iframe[^>]*>.*?<\/iframe>/gi,
-    /<object[^>]*>.*?<\/object>/gi,
-    /<embed[^>]*>/gi,
+    /<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi,
+    /<object\b[^>]*>[\s\S]*?<\/object>/gi,
+    /<embed\b[^>]*>/gi,
     /expression\s*\(/gi,
     /vbscript:/gi,
-    /<img[^>]*src[^>]*javascript:/gi,
+    /<img\b[^>]*src\s*=\s*[^>]*javascript:/gi,
   ];
 
   for (const pattern of xssPatterns) {
@@ -70,10 +70,11 @@ function validateSearchTerm(input) {
 
   // SQL Injection Detection
   const sqlPatterns = [
-    /(\b(select|insert|update|delete|drop|create|alter|exec|execute|union|or|and)\b)/gi,
+    /\b(select|insert|update|delete|drop|create|alter|exec|execute|union|or|and)\b/gi,
     /['"];|--|\/\*|\*\//g,
-    /\b(or|and)\s+\w{1,20}\s*=\s*\w{1,20}/gi,
-    /\bunion\s+(all\s+)?select/gi, // eslint-disable-line security/detect-unsafe-regex
+    /\s+(or|and)\s+\d+\s*=\s*\d+/gi,
+    // eslint-disable-next-line security/detect-unsafe-regex
+    /\bunion\s+(?:all\s+)?select/gi,
     /\b(exec|execute)\s*\(/gi,
   ];
 
@@ -158,8 +159,11 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+let server;
+if (require.main === module) {
+  server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 module.exports = { app, server, validateSearchTerm };
