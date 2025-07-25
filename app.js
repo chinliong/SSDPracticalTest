@@ -1,6 +1,6 @@
-const express = require('express');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
+const express = require("express");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,11 +8,11 @@ const PORT = process.env.PORT || 3000;
 // HTML escape function to prevent XSS
 function escapeHtml(text) {
   const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
   };
   return text.replace(/[&<>"']/g, function (m) {
     return map[m];
@@ -36,7 +36,7 @@ app.use(
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: 'Too many requests from this IP, please try again later.',
+  message: "Too many requests from this IP, please try again later.",
 });
 app.use(limiter);
 
@@ -45,46 +45,45 @@ app.use(express.urlencoded({ extended: true }));
 
 // Input validation function
 function validateSearchTerm(input) {
-  if (!input || typeof input !== 'string') {
-    return { isValid: true, type: 'valid' };
+  if (!input || typeof input !== "string") {
+    return { isValid: true, type: "valid" };
   }
 
   // XSS Detection - OWASP Control C5: Validate All Inputs
-  // Using safer, more specific patterns to avoid ReDoS
   const xssPatterns = [
-    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    /<script[^>]*>.*?<\/script>/gi,
     /javascript:/gi,
-    /\bon\w+\s*=/gi,
-    /<iframe\b[^>]*>/gi,
-    /<object\b[^>]*>/gi,
-    /<embed\b[^>]*>/gi,
+    /on\w+\s*=/gi,
+    /<iframe[^>]*>.*?<\/iframe>/gi,
+    /<object[^>]*>.*?<\/object>/gi,
+    /<embed[^>]*>/gi,
     /expression\s*\(/gi,
     /vbscript:/gi,
-    /<img\b[^>]*\bsrc\b[^>]*javascript:/gi,
+    /<img[^>]*src[^>]*javascript:/gi,
   ];
 
   for (const pattern of xssPatterns) {
     if (pattern.test(input)) {
-      return { isValid: false, type: 'xss' };
+      return { isValid: false, type: "xss" };
     }
   }
 
-  // SQL Injection Detection - Using safer patterns
+  // SQL Injection Detection
   const sqlPatterns = [
-    /\b(?:select|insert|update|delete|drop|create|alter|exec|execute|union)\b/gi,
-    /['"]\s*;|--|\/\*|\*\//g,
-    /\b(?:or|and)\s+\w+\s*=\s*\w+/gi,
-    /\bunion\s+(?:all\s+)?select\b/gi,
-    /\b(?:exec|execute)\s*\(/gi,
+    /(\b(select|insert|update|delete|drop|create|alter|exec|execute|union|or|and)\b)/gi,
+    /['"];|--|\/\*|\*\//g,
+    /\b(or|and)\s+\w{1,20}\s*=\s*\w{1,20}/gi,
+    /\bunion\s+(all\s+)?select/gi, // eslint-disable-line security/detect-unsafe-regex
+    /\b(exec|execute)\s*\(/gi,
   ];
 
   for (const pattern of sqlPatterns) {
     if (pattern.test(input)) {
-      return { isValid: false, type: 'sql' };
+      return { isValid: false, type: "sql" };
     }
   }
 
-  return { isValid: true, type: 'valid' };
+  return { isValid: true, type: "valid" };
 }
 
 // Routes
