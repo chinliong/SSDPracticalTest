@@ -122,7 +122,7 @@ app.post("/search", (req, res) => {
     return res.redirect("/");
   }
 
-  // Valid input - display search term
+  // Valid input - display search terms
   res.send(`
     <!DOCTYPE html>
     <html lang="en">
