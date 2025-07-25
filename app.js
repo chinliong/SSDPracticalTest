@@ -11,22 +11,26 @@ function escapeHtml(text) {
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
-    "\"": "&quot;",
-    "'": "&#039;"
+    '"': "&quot;",
+    "'": "&#039;",
   };
-  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+  return text.replace(/[&<>"']/g, function (m) {
+    return map[m];
+  });
 }
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+      },
     },
-  },
-}));
+  })
+);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -55,7 +59,7 @@ function validateSearchTerm(input) {
     /<embed[^>]*>/gi,
     /expression\s*\(/gi,
     /vbscript:/gi,
-    /<img[^>]*src[^>]*javascript:/gi
+    /<img[^>]*src[^>]*javascript:/gi,
   ];
 
   for (const pattern of xssPatterns) {
@@ -70,7 +74,7 @@ function validateSearchTerm(input) {
     /['"];|--|\/\*|\*\//g,
     /\b(or|and)\s+\w{1,20}\s*=\s*\w{1,20}/gi,
     /\bunion\s+(all\s+)?select/gi, // eslint-disable-line security/detect-unsafe-regex
-    /\b(exec|execute)\s*\(/gi
+    /\b(exec|execute)\s*\(/gi,
   ];
 
   for (const pattern of sqlPatterns) {
